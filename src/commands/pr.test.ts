@@ -86,7 +86,7 @@ vi.mock('../lib/gh.js', () => ({
   isGhCliInstalled: vi.fn(() => false),
   getDefaultBranch: vi.fn(() => null),
   getExistingPrUrl: vi.fn(() => null),
-  hasUpstreamBranch: vi.fn(() => true),
+  hasRemoteBranch: vi.fn(() => true),
   pushBranchToOrigin: vi.fn()
 }))
 
@@ -244,15 +244,13 @@ describe('prCommand', () => {
       expect(urlCall).toBeDefined()
     })
 
-    it('should prompt to push when no upstream branch exists', async () => {
-      const { isGhCliInstalled, hasUpstreamBranch, pushBranchToOrigin } = await import(
-        '../lib/gh.js'
-      )
+    it('should prompt to push when no remote branch exists', async () => {
+      const { isGhCliInstalled, hasRemoteBranch, pushBranchToOrigin } = await import('../lib/gh.js')
       const readline = await import('node:readline')
 
-      // Mock gh CLI as installed but no upstream branch
+      // Mock gh CLI as installed but no remote branch
       vi.mocked(isGhCliInstalled).mockReturnValue(true)
-      vi.mocked(hasUpstreamBranch).mockReturnValue(false)
+      vi.mocked(hasRemoteBranch).mockReturnValue(false)
 
       // Mock user confirms push, then confirms PR creation
       let callCount = 0
@@ -271,13 +269,11 @@ describe('prCommand', () => {
     })
 
     it('should abort when user declines to push', async () => {
-      const { isGhCliInstalled, hasUpstreamBranch, pushBranchToOrigin } = await import(
-        '../lib/gh.js'
-      )
+      const { isGhCliInstalled, hasRemoteBranch, pushBranchToOrigin } = await import('../lib/gh.js')
       const readline = await import('node:readline')
 
       vi.mocked(isGhCliInstalled).mockReturnValue(true)
-      vi.mocked(hasUpstreamBranch).mockReturnValue(false)
+      vi.mocked(hasRemoteBranch).mockReturnValue(false)
 
       // Mock user declines push
       vi.mocked(readline.createInterface).mockReturnValue({

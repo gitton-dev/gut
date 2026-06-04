@@ -1,4 +1,4 @@
-import { execSync } from 'node:child_process'
+import { execFileSync, execSync } from 'node:child_process'
 import chalk from 'chalk'
 
 let ghInstalledCache: boolean | null = null
@@ -73,8 +73,19 @@ export function hasUpstreamBranch(): boolean {
   }
 }
 
+export function hasRemoteBranch(branch: string): boolean {
+  try {
+    const result = execFileSync('git', ['ls-remote', '--heads', 'origin', branch], {
+      stdio: ['pipe', 'pipe', 'pipe']
+    })
+    return result.toString().trim().length > 0
+  } catch {
+    return false
+  }
+}
+
 export function pushBranchToOrigin(branch: string): void {
-  execSync(`git push -u origin ${branch}`, {
+  execFileSync('git', ['push', '-u', 'origin', branch], {
     stdio: ['pipe', 'pipe', 'pipe']
   })
 }

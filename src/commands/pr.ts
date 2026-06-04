@@ -11,7 +11,7 @@ import { resolveProvider } from '../lib/credentials.js'
 import {
   getDefaultBranch,
   getExistingPrUrl,
-  hasUpstreamBranch,
+  hasRemoteBranch,
   isGhCliInstalled,
   pushBranchToOrigin
 } from '../lib/gh.js'
@@ -169,8 +169,8 @@ export const prCommand = new Command('pr')
       } else {
         const readline = await import('node:readline')
 
-        // Check if remote branch exists
-        if (!hasUpstreamBranch()) {
+        // Check if the branch actually exists on origin (not just upstream config)
+        if (!hasRemoteBranch(currentBranch)) {
           const rl = readline.createInterface({
             input: process.stdin,
             output: process.stdout
@@ -178,7 +178,9 @@ export const prCommand = new Command('pr')
 
           const pushAnswer = await new Promise<string>((resolve) => {
             rl.question(
-              chalk.cyan(`\nNo remote branch found. Push ${currentBranch} to origin? (y/N) `),
+              chalk.cyan(
+                `\nBranch ${currentBranch} is not published. Create origin/${currentBranch}? (y/N) `
+              ),
               resolve
             )
           })
